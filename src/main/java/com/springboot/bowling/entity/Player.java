@@ -31,5 +31,6 @@ public class Player {
     /**
      * Player Name
      */
+    @Column(nullable = false)
     private String name;
 }
