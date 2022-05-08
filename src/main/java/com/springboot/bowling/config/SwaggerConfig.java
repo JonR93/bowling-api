@@ -14,6 +14,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Swagger Configurations
+ *
+ * @see <a href="http://localhost:8080/swagger-ui/index.html#/">Swagger Documentation</a>
+ * when the app is running to read documentation and test endpoints
+ */
 @Configuration
 public class SwaggerConfig {
 
