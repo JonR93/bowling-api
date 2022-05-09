@@ -33,4 +33,11 @@ public class Player {
      */
     @Column(nullable = false)
     private String name;
+
+    /**
+     * Player's scoresheet for the current game being played
+     */
+    @OneToOne
+    @JoinColumn(name = "scoresheet_id")
+    private Scoresheet scoreSheet;
 }
