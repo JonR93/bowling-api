@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotEmpty;
 
 /**
- * Player DTO
+ * Player information
  */
 
 @ApiModel(description = "Player Model Info")

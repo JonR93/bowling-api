@@ -23,7 +23,7 @@ import java.util.Map;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**
-     * Catch my custom {@link ResourceNotFoundException}
+     * Sends an error dto on behalf of my custom {@link ResourceNotFoundException}
      * @param exception
      * @param request
      * @return Detailed error message informing the user that their resource was not found + 404 status code
@@ -36,7 +36,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Throw handleMethodArgumentNotValid when an endpoint is misused
+     * Sends an error dto on behalf of my custom {@link BadRequestException}
+     * @param exception
+     * @param request
+     * @return Error message with HttpStatus.BAD_REQUEST status informing the client of their bad request
+     */
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorDto> handleBlogApiException(BadRequestException exception, WebRequest request) {
+        ErrorDto error = new ErrorDto(new Date(), exception.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Sends a list of errors on behalf of MethodArgumentNotValidException
      * @param exception
      * @param headers
      * @param status

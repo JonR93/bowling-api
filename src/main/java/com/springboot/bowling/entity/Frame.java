@@ -1,22 +1,28 @@
 package com.springboot.bowling.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.Optional;
 
 /**
  * Represents a frame on a players scoresheet to keep track of the players score
  */
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "frames")
+@Table(name = "frames", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"scoresheet_id"}),
+        @UniqueConstraint(columnNames = {"frameIndex"})
+})
 public class Frame implements Comparable<Frame> {
     /**
      * Frame Unique Id
@@ -56,9 +62,10 @@ public class Frame implements Comparable<Frame> {
     private Integer thirdRoll;
 
     /**
-     * Points scored during this frame
+     * The score for this frame
+     * Note: can change based on spare/strike bonuses
      */
-    private int totalPoints = 0;
+    private Integer score = 0;
 
     /**
      * Is this frame a strike?
@@ -80,6 +87,29 @@ public class Frame implements Comparable<Frame> {
                 && firstRoll != 10
                 && secondRoll!=null
                 && Integer.sum(firstRoll, secondRoll) == 10;
+    }
+
+    /**
+     * Calculate the number of pins remaining based on previous rolls
+     * @return number of pins remaining
+     */
+    @Transient
+    public int getRemainingNumberOfPins(){
+        if(frameIndex < 9) {
+            // On frames 1-9 you could potentially knock over 20 pins in 2 turns
+            return 20
+                    - Optional.ofNullable(firstRoll).orElse(0)
+                    - Optional.ofNullable(secondRoll).orElse(0);
+        } else if(frameIndex == 9) {
+            // On frame 10 you could potentially knock over 30 pins in 3 turns
+            return 30
+                    - Optional.ofNullable(firstRoll).orElse(0)
+                    - Optional.ofNullable(secondRoll).orElse(0)
+                    - Optional.ofNullable(thirdRoll).orElse(0);
+        } else {
+            // Invalid frame index. No pins to knock down
+            return 0;
+        }
     }
 
     /**
@@ -126,5 +156,49 @@ public class Frame implements Comparable<Frame> {
         return new CompareToBuilder()
                 .append(this.frameIndex, other.frameIndex)
                 .toComparison();
+    }
+
+    /**
+     * String representation of a frame
+     * @return frame represented as 1 to 3 characters,
+     * like so:
+     *          '-' 0 pins knocked down
+     *          '1' to '9' Number of pins knocked down
+     *          '/' Spare
+     *          'X' Strike
+     */
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        if(isStrike()){
+            sb.append('X');
+            if(frameIndex==9){
+                // Check if we need to include bonus rolls on last frame
+                if(Integer.valueOf(10).equals(secondRoll)){
+                    sb.append('X'); // bonus strike
+                    if(Integer.valueOf(10).equals(thirdRoll)){
+                        sb.append('X'); // second bonus strike
+                    }
+                } else if(secondRoll!=null && thirdRoll != null && Integer.sum(secondRoll, thirdRoll) == 10){
+                    sb.append(secondRoll.equals(0)?'-':secondRoll).append('/'); // bonus spare
+                } else {
+                    sb.append(Optional.ofNullable(secondRoll).orElse(0).equals(0)?'-':secondRoll);
+                    sb.append(Optional.ofNullable(thirdRoll).orElse(0).equals(0)?'-':thirdRoll);
+                }
+            }
+        } else if(isSpare()){
+            sb.append(firstRoll.equals(0)?'-':firstRoll).append('/');
+            if(frameIndex==9){
+                // Check if we need to include bonus rolls on last frame
+                if(Integer.valueOf(10).equals(thirdRoll)){
+                    sb.append('X'); // bonus strike
+                } else{
+                    sb.append(Optional.ofNullable(thirdRoll).orElse(0).equals(0)?'-':thirdRoll); // bonus roll
+                }
+            }
+        } else{
+            sb.append(Optional.ofNullable(firstRoll).orElse(0).equals(0)?'-':firstRoll);
+            sb.append(Optional.ofNullable(secondRoll).orElse(0).equals(0)?'-':secondRoll);
+        }
+        return sb.toString();
     }
 }

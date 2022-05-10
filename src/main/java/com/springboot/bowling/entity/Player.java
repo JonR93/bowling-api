@@ -40,4 +40,8 @@ public class Player {
     @OneToOne
     @JoinColumn(name = "scoresheet_id")
     private Scoresheet scoreSheet;
+
+    public String toString(){
+        return name;
+    }
 }

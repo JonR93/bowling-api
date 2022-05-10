@@ -8,9 +8,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * An entity that has a collection of 10 frames that keeps track of the players score
@@ -42,84 +41,20 @@ public class Scoresheet {
     private List<Frame> frames = new ArrayList<>();
 
     /**
-     * Total score
-     * @return total score of all played frames
+     * Represent this scoresheet as a string of frame scores
+     * @return String of frame scores
      */
-    @Transient
-    public int getTotalScore() {
-        int totalScore = 0;
-        Collections.sort(frames);
-        for(Frame frame: frames){
-            totalScore += getFrameScore(frame.getFrameIndex());
-        }
-        return totalScore;
-    }
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
 
-    /**
-     * Calculate the score for a given frame index
-     * @param frameIndex
-     * @return frame score
-     */
-    private int getFrameScore(int frameIndex) {
-        Frame frame = frames.get(frameIndex);
-        if (frame == null) {
-            return 0;
-        }
-        if (frame.isStrike()) {
-            return 10 + strikeBonus(frameIndex);
-        }
-        if (frame.isSpare()) {
-            return 10 + spareBonus(frameIndex);
-        }
-        return rollValue(frame.getFirstRoll()) + rollValue(frame.getSecondRoll());
-    }
-
-    /**
-     * Calculate the Spare Bonus for a frame
-     * @param frameIndex
-     * @return frame score with spare bonus calculated
-     */
-    private int spareBonus(int frameIndex) {
-        if (frameIndex == 9) {
-            Frame lastFrame = frames.get(frameIndex);
-            return rollValue(lastFrame.getThirdRoll());
-        }
-        Frame nextFrame = frames.get(frameIndex + 1);
-        return nextFrame == null ? 0 : rollValue(nextFrame.getFirstRoll());
-    }
-
-    /**
-     * Calculate the Strike Bonus for a frame
-     * @param frameIndex
-     * @return frame score with strike bonus calculated
-     */
-    private int strikeBonus(int frameIndex) {
-        if (frameIndex == 9) {
-            Frame lastFrame = frames.get(frameIndex);
-            return rollValue(lastFrame.getSecondRoll()) + rollValue(lastFrame.getThirdRoll());
-        }
-        Frame nextFrame = frames.get(frameIndex + 1);
-        if (nextFrame == null) {
-            return 0;
-        }
-        if (nextFrame.isStrike()) {
-            if (frameIndex == 8) {
-                return 10 + rollValue(nextFrame.getSecondRoll());
+        Iterator<Frame> it = frames.iterator();
+        if(it.hasNext()){
+            sb.append(it.next().toString());
+            while(it.hasNext()){
+                sb.append(" ").append(it.next().toString());
             }
-            Frame nextNextFrame = frames.get(frameIndex + 2);
-            return nextNextFrame == null ? 0 : 10 + rollValue(nextNextFrame.getFirstRoll());
         }
-        return rollValue(nextFrame.getFirstRoll()) + rollValue(nextFrame.getSecondRoll());
-    }
 
-    /**
-     * Util method to help get the number of pins knocked down when calculating the score.
-     * If a roll hasn't occured yet, its value will be null so use the value of '0' when calculating the score
-     * @param roll
-     * @return Number of pins knocked down during a roll. Return 0 if the roll hasn't happened yet.
-     */
-    private int rollValue(Integer roll){
-        return Optional.ofNullable(roll).orElse(0);
+        return sb.toString();
     }
-
 }
