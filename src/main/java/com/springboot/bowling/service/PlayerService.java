@@ -1,6 +1,10 @@
 package com.springboot.bowling.service;
 
-import com.springboot.bowling.payload.PlayerDto;
+import com.springboot.bowling.payload.request.NewPlayerDto;
+import com.springboot.bowling.payload.response.PlayerAddedDto;
+import com.springboot.bowling.payload.response.PlayerDeletedDto;
+
+import java.util.UUID;
 
 /**
  * Define Player functionality
@@ -10,6 +14,6 @@ import com.springboot.bowling.payload.PlayerDto;
  */
 
 public interface PlayerService {
-    PlayerDto addPlayer(PlayerDto playerDto);
-    void deletePlayer(long id);
+    PlayerAddedDto addPlayer(NewPlayerDto playerDto);
+    PlayerDeletedDto deletePlayer(UUID id);
 }

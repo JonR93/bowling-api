@@ -1,4 +1,4 @@
-package com.springboot.bowling.payload;
+package com.springboot.bowling.payload.response;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -15,6 +15,8 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 public class ErrorDto {
+    @ApiModelProperty(value = "HTTP status")
+    private String status;
     @ApiModelProperty(value = "Error timestamp")
     private Date timestamp;
     @ApiModelProperty(value = "Error message")

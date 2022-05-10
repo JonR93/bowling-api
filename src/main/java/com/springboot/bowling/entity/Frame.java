@@ -70,7 +70,7 @@ public class Frame implements Comparable<Frame> {
      * The score for this frame
      * Note: can change based on spare/strike bonuses
      */
-    private Integer score = 0;
+    private int score = 0;
 
     /**
      * Is this frame a strike?

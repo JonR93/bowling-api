@@ -1,8 +1,11 @@
-package com.springboot.bowling.payload;
+package com.springboot.bowling.payload.request;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+
+import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @ApiModel(description = "Request object to send a user id to the server to start a new game")
 @Data
@@ -11,5 +14,6 @@ import lombok.*;
 @NoArgsConstructor
 public class StartGameDto {
     @ApiModelProperty(value = "Player id")
-    private Long id;
+    @NotNull
+    private UUID id;
 }

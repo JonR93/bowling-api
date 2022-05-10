@@ -1,8 +1,11 @@
 package com.springboot.bowling.service;
 
 import com.springboot.bowling.entity.Scoresheet;
-import com.springboot.bowling.payload.ScoreDto;
-import com.springboot.bowling.payload.ScoresheetDto;
+import com.springboot.bowling.payload.response.GameStatedDto;
+import com.springboot.bowling.payload.response.ScoreDto;
+import com.springboot.bowling.payload.response.ScoresheetDto;
+
+import java.util.UUID;
 
 /**
  * Define Game functionality
@@ -13,8 +16,8 @@ import com.springboot.bowling.payload.ScoresheetDto;
  */
 public interface GameService {
     Scoresheet generateNewScoresheet();
-    void startGame(Long playerId);
-    void throwBall(Long playerId, int frameIndex, int ballIndex, int score);
-    ScoreDto getPlayersCurrentScore(Long playerId);
-    ScoresheetDto getPlayersScoresheet(Long playerId);
+    GameStatedDto startGame(UUID playerId);
+    void throwBall(UUID playerId, int frameIndex, int ballIndex, int score);
+    ScoreDto getPlayersCurrentScore(UUID playerId);
+    ScoresheetDto getPlayersScoresheet(UUID playerId);
 }

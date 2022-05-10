@@ -6,18 +6,17 @@ import com.springboot.bowling.entity.Scoresheet;
 import com.springboot.bowling.exception.BadRequestException;
 import com.springboot.bowling.exception.MissingScoresheetException;
 import com.springboot.bowling.exception.ResourceNotFoundException;
-import com.springboot.bowling.payload.ScoreDto;
-import com.springboot.bowling.payload.ScoresheetDto;
+import com.springboot.bowling.payload.response.GameStatedDto;
+import com.springboot.bowling.payload.response.ScoreDto;
+import com.springboot.bowling.payload.response.ScoresheetDto;
 import com.springboot.bowling.repository.PlayerRepository;
 import com.springboot.bowling.repository.ScoresheetRepository;
 import com.springboot.bowling.service.GameService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * GameService Implementation
@@ -33,12 +32,14 @@ public class GameServiceImpl implements GameService {
     /**
      * Give a player a new scoresheet with 10 blank frames
      * @param playerId
+     * @return
      */
     @Override
-    public void startGame(Long playerId) {
+    public GameStatedDto startGame(UUID playerId) {
         Player player = playerRepository.findById(playerId).orElseThrow(() -> new ResourceNotFoundException(Player.class,"id",playerId));
         player.setScoreSheet(generateNewScoresheet());
         playerRepository.save(player);
+        return new GameStatedDto(HttpStatus.OK.getReasonPhrase());
     }
 
     /**
@@ -49,7 +50,7 @@ public class GameServiceImpl implements GameService {
      * @param score
      */
     @Override
-    public void throwBall(Long playerId, int frameIndex, int ballIndex, int score) {
+    public void throwBall(UUID playerId, int frameIndex, int ballIndex, int score) {
         Player player = playerRepository.findById(playerId).orElseThrow(() -> new ResourceNotFoundException(Player.class,"id",playerId));
         Scoresheet scoresheet = Optional.ofNullable(player.getScoreSheet()).orElseThrow(() -> new MissingScoresheetException(player));
 
@@ -76,12 +77,12 @@ public class GameServiceImpl implements GameService {
      * @return player's current score
      */
     @Override
-    public ScoreDto getPlayersCurrentScore(Long playerId) {
+    public ScoreDto getPlayersCurrentScore(UUID playerId) {
         int currentScore = 0;
         Player player = playerRepository.findById(playerId).orElseThrow(() -> new ResourceNotFoundException(Player.class,"id",playerId));
         Scoresheet scoresheet = Optional.ofNullable(player.getScoreSheet()).orElseThrow(() -> new MissingScoresheetException(player));
         int currentFrameIndex = scoresheet.getCurrentFrameIndex();
-        return new ScoreDto(scoresheet.getScoreAtFrame(currentFrameIndex));
+        return new ScoreDto(HttpStatus.OK.getReasonPhrase(),scoresheet.getScoreAtFrame(currentFrameIndex));
     }
 
     /**
@@ -90,10 +91,10 @@ public class GameServiceImpl implements GameService {
      * @return scoresheet of a given player
      */
     @Override
-    public ScoresheetDto getPlayersScoresheet(Long playerId) {
+    public ScoresheetDto getPlayersScoresheet(UUID playerId) {
         Player player = playerRepository.findById(playerId).orElseThrow(() -> new ResourceNotFoundException(Player.class,"id",playerId));
         Scoresheet scoresheet = Optional.ofNullable(player.getScoreSheet()).orElseThrow(() -> new MissingScoresheetException(player));
-        return new ScoresheetDto(scoresheet.toString());
+        return new ScoresheetDto(HttpStatus.OK.getReasonPhrase(),scoresheet.toString());
     }
 
     /**

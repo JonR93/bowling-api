@@ -1,4 +1,4 @@
-package com.springboot.bowling.payload;
+package com.springboot.bowling.payload.response;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,12 +12,15 @@ import lombok.NoArgsConstructor;
  * Contains the player's name and their frame scores
  */
 
-@ApiModel(description = "Player's scoresheet")
+@ApiModel(description = "Response DTO representing the player's scoresheet")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ScoresheetDto {
+
+    @ApiModelProperty(value = "HTTP status")
+    private String status;
 
     @ApiModelProperty(value = "Player's scoresheet")
     private String sheet;

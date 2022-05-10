@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 /**
  * Represents a Player registered to play
@@ -24,9 +25,9 @@ public class Player {
      * Player Unique Id
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     @Column(name = "id", nullable = false)
-    private Long id;
+    private UUID id;
 
     /**
      * Player Name

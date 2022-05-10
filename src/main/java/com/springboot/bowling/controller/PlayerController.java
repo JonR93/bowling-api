@@ -1,6 +1,8 @@
 package com.springboot.bowling.controller;
 
-import com.springboot.bowling.payload.PlayerDto;
+import com.springboot.bowling.payload.request.NewPlayerDto;
+import com.springboot.bowling.payload.response.PlayerAddedDto;
+import com.springboot.bowling.payload.response.PlayerDeletedDto;
 import com.springboot.bowling.service.PlayerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 /**
  * Player Endpoints
@@ -30,7 +33,7 @@ public class PlayerController {
      */
     @ApiOperation(value = "Add a new Player")
     @PostMapping
-    public ResponseEntity<PlayerDto> addPlayer(@Valid @RequestBody PlayerDto playerDto){
+    public ResponseEntity<PlayerAddedDto> addPlayer(@Valid @RequestBody NewPlayerDto playerDto){
         return new ResponseEntity<>(playerService.addPlayer(playerDto), HttpStatus.CREATED);
     }
 
@@ -41,8 +44,7 @@ public class PlayerController {
      */
     @ApiOperation(value = "Delete a Player by id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePlayer(@PathVariable(name = "id") long id){
-        playerService.deletePlayer(id);
-        return new ResponseEntity<>("Player deleted successfully.", HttpStatus.OK);
+    public ResponseEntity<PlayerDeletedDto> deletePlayer(@PathVariable(name = "id") UUID id){
+        return new ResponseEntity<>(playerService.deletePlayer(id), HttpStatus.OK);
     }
 }

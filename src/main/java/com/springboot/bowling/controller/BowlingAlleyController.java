@@ -1,6 +1,11 @@
 package com.springboot.bowling.controller;
 
-import com.springboot.bowling.payload.*;
+import com.springboot.bowling.payload.request.StartGameDto;
+import com.springboot.bowling.payload.request.ThrowBallDto;
+import com.springboot.bowling.payload.response.BallThrownDto;
+import com.springboot.bowling.payload.response.GameStatedDto;
+import com.springboot.bowling.payload.response.ScoreDto;
+import com.springboot.bowling.payload.response.ScoresheetDto;
 import com.springboot.bowling.service.GameService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 @Api(value = "Bowling Alley endpoints")
 @RestController
@@ -26,9 +32,8 @@ public class BowlingAlleyController {
      */
     @ApiOperation(value = "Start a new game for a given player")
     @PostMapping("/startGame")
-    public ResponseEntity<String> startGame(@Valid @RequestBody StartGameDto startGameDto) {
-        gameService.startGame(startGameDto.getId());
-        return new ResponseEntity<>("New game started.", HttpStatus.OK);
+    public ResponseEntity<GameStatedDto> startGame(@Valid @RequestBody StartGameDto startGameDto) {
+        return new ResponseEntity<>(gameService.startGame(startGameDto.getId()), HttpStatus.OK);
     }
 
     /**
@@ -38,12 +43,12 @@ public class BowlingAlleyController {
      */
     @ApiOperation(value = "Throw a ball for a player")
     @PostMapping("/throwBall")
-    public ResponseEntity<String> throwBall(@Valid @RequestBody ThrowBallDto throwBallDto){
+    public ResponseEntity<BallThrownDto> throwBall(@Valid @RequestBody ThrowBallDto throwBallDto){
         gameService.throwBall(throwBallDto.getId(),
                 throwBallDto.getFrameIndex(),
                 throwBallDto.getBallIndex(),
                 throwBallDto.getScore());
-        return new ResponseEntity<>("", HttpStatus.OK);
+        return new ResponseEntity<>(new BallThrownDto(HttpStatus.OK.getReasonPhrase()), HttpStatus.OK);
     }
 
     /**
@@ -53,7 +58,7 @@ public class BowlingAlleyController {
      */
     @ApiOperation(value = "Get a player's current score")
     @GetMapping("/score/{playerId}")
-    public ResponseEntity<ScoreDto> getPlayerScore(@PathVariable(name = "playerId") Long playerId){
+    public ResponseEntity<ScoreDto> getPlayerScore(@PathVariable(name = "playerId") UUID playerId){
         return new ResponseEntity<>(gameService.getPlayersCurrentScore(playerId), HttpStatus.OK);
     }
 
@@ -64,7 +69,7 @@ public class BowlingAlleyController {
      */
     @ApiOperation(value = "Get a player's current scoresheet")
     @GetMapping("/scoresheet/{playerId}")
-    public ResponseEntity<ScoresheetDto> getPlayerScoresheet(@PathVariable(name = "playerId") Long playerId){
+    public ResponseEntity<ScoresheetDto> getPlayerScoresheet(@PathVariable(name = "playerId") UUID playerId){
         return new ResponseEntity<>(gameService.getPlayersScoresheet(playerId), HttpStatus.OK);
     }
 

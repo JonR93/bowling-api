@@ -1,4 +1,4 @@
-package com.springboot.bowling.payload;
+package com.springboot.bowling.payload.request;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,18 +10,14 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotEmpty;
 
 /**
- * Player information
+ * Request DTO for adding a new player to the system
  */
 
 @ApiModel(description = "Player Model Info")
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlayerDto {
-    @ApiModelProperty(value = "Player id")
-    private Long id;
-
+public class NewPlayerDto {
     @ApiModelProperty(value = "Player name")
     @NotEmpty
     private String name;
