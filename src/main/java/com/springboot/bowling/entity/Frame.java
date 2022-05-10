@@ -95,14 +95,37 @@ public class Frame implements Comparable<Frame> {
     }
 
     /**
+     * Determine what the current ball index of this frame is.
+     * @return
+     * 0 = not rolled at all
+     * 1 = rolled once but did not score a strike in frames(1-9) or scored a strike in frame 10
+     * 2 = rolled twice and on the last frame because a strike or spare was scored
+     * null = all applicable rolls have been recorded. No more rolls this frame.
+     */
+    @Transient
+    public Integer getCurrentBallIndex(){
+        if(firstRoll==null){
+            return 0;
+        }
+        if(secondRoll==null && ((!isStrike() && frameIndex<9) || (frameIndex==9 && isStrike()))){
+            return 1;
+        }
+        if(thirdRoll==null && frameIndex==9 && (isStrike() || isSpare())){
+            return 2;
+        }
+        // you have no more turns on this frame
+        return null;
+    }
+
+    /**
      * Calculate the number of pins remaining based on previous rolls
      * @return number of pins remaining
      */
     @Transient
     public int getRemainingNumberOfPins(){
         if(frameIndex < 9) {
-            // On frames 1-9 you could potentially knock over 20 pins in 2 turns
-            return 20
+            // On frames 1-9 you could potentially knock over 10 pins in 2 turns
+            return 10
                     - Optional.ofNullable(firstRoll).orElse(0)
                     - Optional.ofNullable(secondRoll).orElse(0);
         } else if(frameIndex == 9) {

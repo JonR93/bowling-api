@@ -118,14 +118,7 @@ public class GameServiceImpl implements GameService {
      * @param score
      */
     private void recordFrameScore(Frame frame, int ballIndex, int score){
-        if(frame.isComplete()){
-            String msg = String.format("Exceeded maximum ball throws for this frame index: %s.", frame.getFrameIndex());
-            throw new BadRequestException(msg);
-        }
-        if(score > frame.getRemainingNumberOfPins()){
-            String msg = String.format("Attempted to knock over more pins than there are remaining. Only %s pins remain.", frame.getRemainingNumberOfPins());
-            throw new BadRequestException(msg);
-        }
+        validateBallThrow(frame,ballIndex,score);
         switch (ballIndex) {
             case 0:
                 frame.setFirstRoll(score);
@@ -134,14 +127,31 @@ public class GameServiceImpl implements GameService {
                 frame.setSecondRoll(score);
                 break;
             case 2:
-                if(frame.getFrameIndex() == 9) {
-                    frame.setThirdRoll(score);
-                } else{
-                    throw new BadRequestException("Slow down. You're throwing too many balls.");
-                }
+                frame.setThirdRoll(score);
                 break;
             default:
                 throw new BadRequestException("Slow down. You're throwing too many balls.");
+        }
+    }
+
+    /**
+     * Perform some basic validation checks to verify the score for this throw can be recorded
+     * @param frame
+     * @param ballIndex
+     * @param score
+     */
+    private void validateBallThrow(Frame frame, int ballIndex, int score){
+        if(frame.getCurrentBallIndex()==null){
+            String msg = String.format("Exceeded maximum ball throws for this frame index: %s.", frame.getFrameIndex());
+            throw new BadRequestException(msg);
+        }
+        if(!Integer.valueOf(ballIndex).equals(frame.getCurrentBallIndex())){
+            String msg = String.format("The provided ball index does not match the current ball index: %s for frame index: %s.", frame.getCurrentBallIndex(),frame.getFrameIndex());
+            throw new BadRequestException(msg);
+        }
+        if(score > frame.getRemainingNumberOfPins()){
+            String msg = String.format("Attempted to knock over more pins than there are remaining. Only %s pins remain.", frame.getRemainingNumberOfPins());
+            throw new BadRequestException(msg);
         }
     }
 
