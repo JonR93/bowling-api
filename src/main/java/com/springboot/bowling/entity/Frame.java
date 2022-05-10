@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.Optional;
 
@@ -42,23 +44,30 @@ public class Frame implements Comparable<Frame> {
     /**
      * An index to note which frame this is on the scoresheet
      */
-    @Size(max = 9)
+    @Min(0)
+    @Max(9)
     private int frameIndex = 0;
 
     /**
      * Number of pins the player knocked down on the first roll
      */
+    @Min(0)
+    @Max(10)
     private Integer firstRoll;
 
     /**
      * Number of pins the player knocked down on the second roll
      */
+    @Min(0)
+    @Max(10)
     private Integer secondRoll;
 
     /**
      * Number of pins the player knocked down on the third roll
      * Note: only applicable in the 10th frame
      */
+    @Min(0)
+    @Max(10)
     private Integer thirdRoll;
 
     /**

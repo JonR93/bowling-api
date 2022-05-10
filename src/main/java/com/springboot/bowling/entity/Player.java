@@ -37,8 +37,8 @@ public class Player {
     /**
      * Player's scoresheet for the current game being played
      */
-    @OneToOne
-    @JoinColumn(name = "scoresheet_id")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "scoreSheet_id")
     private Scoresheet scoreSheet;
 
     public String toString(){
