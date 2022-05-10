@@ -1,9 +1,6 @@
 package com.springboot.bowling.controller;
 
-import com.springboot.bowling.payload.PlayerDto;
-import com.springboot.bowling.payload.ScoreDto;
-import com.springboot.bowling.payload.ScoresheetDto;
-import com.springboot.bowling.payload.ThrowBallDto;
+import com.springboot.bowling.payload.*;
 import com.springboot.bowling.service.GameService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,21 +13,21 @@ import javax.validation.Valid;
 
 @Api(value = "Bowling Alley endpoints")
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping
 @AllArgsConstructor
 public class BowlingAlleyController {
 
     private GameService gameService;
 
     /**
-     * Start a new game for a given player
-     * @param playerDto
+     * Start a new game for a given player id
+     * @param startGameDto
      * @return HttpStatus.OK status code 200
      */
     @ApiOperation(value = "Start a new game for a given player")
     @PostMapping("/startGame")
-    public ResponseEntity<String> startGame(@Valid @RequestBody PlayerDto playerDto){
-        gameService.startGame(playerDto.getId());
+    public ResponseEntity<String> startGame(@Valid @RequestBody StartGameDto startGameDto) {
+        gameService.startGame(startGameDto.getId());
         return new ResponseEntity<>("New game started.", HttpStatus.OK);
     }
 

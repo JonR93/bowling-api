@@ -17,7 +17,7 @@ import javax.validation.Valid;
 
 @Api(value = "Player creation and deletion endpoints")
 @RestController
-@RequestMapping("/api/v1/player")
+@RequestMapping("/player")
 @AllArgsConstructor
 public class PlayerController {
 
