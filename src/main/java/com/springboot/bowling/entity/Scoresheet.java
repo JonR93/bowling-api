@@ -1,14 +1,14 @@
 package com.springboot.bowling.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OrderBy;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,7 +19,6 @@ import java.util.List;
  */
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -42,7 +41,22 @@ public class Scoresheet {
      */
     @OneToMany(mappedBy = "scoresheet", cascade = CascadeType.ALL, orphanRemoval = true)
     @Size(max=10)
+    @OrderBy(clause = "frameIndex ASC")
     private List<Frame> frames = new ArrayList<>();
+
+    /**
+     * Get the score at a given frame index
+     * @param frameIndex
+     * @return frame score
+     */
+    @Transient
+    public int getScoreAtFrame(int frameIndex){
+        int score = 0;
+        for(int i=0; i<=frameIndex; i++){
+            score += this.frames.get(i).getScore();
+        }
+        return score;
+    }
 
     /**
      * Represent this scoresheet as a string of frame scores

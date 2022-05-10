@@ -9,7 +9,6 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 import java.util.Optional;
 
 /**
@@ -21,10 +20,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "frames", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"scoresheet_id"}),
-        @UniqueConstraint(columnNames = {"frameIndex"})
-})
+@Table(name = "frames")
 public class Frame implements Comparable<Frame> {
     /**
      * Frame Unique Id
@@ -179,34 +175,34 @@ public class Frame implements Comparable<Frame> {
     public String toString(){
         StringBuilder sb = new StringBuilder();
         if(isStrike()){
-            sb.append('X');
+            sb.append("X");
             if(frameIndex==9){
                 // Check if we need to include bonus rolls on last frame
                 if(Integer.valueOf(10).equals(secondRoll)){
-                    sb.append('X'); // bonus strike
+                    sb.append("X"); // bonus strike
                     if(Integer.valueOf(10).equals(thirdRoll)){
-                        sb.append('X'); // second bonus strike
+                        sb.append("X"); // second bonus strike
                     }
                 } else if(secondRoll!=null && thirdRoll != null && Integer.sum(secondRoll, thirdRoll) == 10){
-                    sb.append(secondRoll.equals(0)?'-':secondRoll).append('/'); // bonus spare
+                    sb.append(secondRoll.equals(0)?"-":secondRoll).append("/"); // bonus spare
                 } else {
-                    sb.append(Optional.ofNullable(secondRoll).orElse(0).equals(0)?'-':secondRoll);
-                    sb.append(Optional.ofNullable(thirdRoll).orElse(0).equals(0)?'-':thirdRoll);
+                    sb.append(Optional.ofNullable(secondRoll).orElse(0).equals(0)?"-":secondRoll);
+                    sb.append(Optional.ofNullable(thirdRoll).orElse(0).equals(0)?"-":thirdRoll);
                 }
             }
         } else if(isSpare()){
-            sb.append(firstRoll.equals(0)?'-':firstRoll).append('/');
+            sb.append(firstRoll.equals(0)?"-":firstRoll).append("/");
             if(frameIndex==9){
                 // Check if we need to include bonus rolls on last frame
                 if(Integer.valueOf(10).equals(thirdRoll)){
-                    sb.append('X'); // bonus strike
+                    sb.append("X"); // bonus strike
                 } else{
-                    sb.append(Optional.ofNullable(thirdRoll).orElse(0).equals(0)?'-':thirdRoll); // bonus roll
+                    sb.append(Optional.ofNullable(thirdRoll).orElse(0).equals(0)?"-":thirdRoll); // bonus roll
                 }
             }
         } else{
-            sb.append(Optional.ofNullable(firstRoll).orElse(0).equals(0)?'-':firstRoll);
-            sb.append(Optional.ofNullable(secondRoll).orElse(0).equals(0)?'-':secondRoll);
+            sb.append(Optional.ofNullable(firstRoll).orElse(0).equals(0)?"-":firstRoll);
+            sb.append(Optional.ofNullable(secondRoll).orElse(0).equals(0)?"-":secondRoll);
         }
         return sb.toString();
     }

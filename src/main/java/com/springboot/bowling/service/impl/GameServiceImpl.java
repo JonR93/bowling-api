@@ -8,13 +8,13 @@ import com.springboot.bowling.exception.MissingScoresheetException;
 import com.springboot.bowling.exception.ResourceNotFoundException;
 import com.springboot.bowling.payload.ScoreDto;
 import com.springboot.bowling.payload.ScoresheetDto;
-import com.springboot.bowling.payload.ThrowBallDto;
 import com.springboot.bowling.repository.PlayerRepository;
+import com.springboot.bowling.repository.ScoresheetRepository;
 import com.springboot.bowling.service.GameService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -28,15 +28,16 @@ import java.util.Optional;
 public class GameServiceImpl implements GameService {
 
     private PlayerRepository playerRepository;
+    private ScoresheetRepository scoresheetRepository;
 
     /**
-     * Give a player a new scoresheet
+     * Give a player a new scoresheet with 10 blank frames
      * @param playerId
      */
     @Override
     public void startGame(Long playerId) {
         Player player = playerRepository.findById(playerId).orElseThrow(() -> new ResourceNotFoundException(Player.class,"id",playerId));
-        player.setScoreSheet(new Scoresheet());
+        player.setScoreSheet(generateNewScoresheet());
         playerRepository.save(player);
     }
 
@@ -58,18 +59,56 @@ public class GameServiceImpl implements GameService {
         }
 
         Frame currentFrame = scoresheet.getFrames().get(frameIndex);
-        if(currentFrame == null){
-            currentFrame = Frame.builder()
-                    .scoresheet(scoresheet)
-                    .frameIndex(frameIndex)
-                    .build();
-            scoresheet.getFrames().add(currentFrame);
-        }
 
         recordFrameScore(currentFrame,ballIndex,score);
         recalculateScoresheet(scoresheet);
 
-        playerRepository.save(player);
+        if(currentFrame.isComplete() && scoresheet.getCurrentFrameIndex()<9){
+            scoresheet.setCurrentFrameIndex(scoresheet.getCurrentFrameIndex()+1);
+        }
+
+        scoresheetRepository.save(scoresheet);
+    }
+
+    /**
+     * Calculate a given player's current score
+     * @param playerId
+     * @return player's current score
+     */
+    @Override
+    public ScoreDto getCurrentScore(Long playerId) {
+        int currentScore = 0;
+        Player player = playerRepository.findById(playerId).orElseThrow(() -> new ResourceNotFoundException(Player.class,"id",playerId));
+        Scoresheet scoresheet = Optional.ofNullable(player.getScoreSheet()).orElseThrow(() -> new MissingScoresheetException(player));
+        int currentFrameIndex = scoresheet.getCurrentFrameIndex();
+        return new ScoreDto(scoresheet.getScoreAtFrame(currentFrameIndex));
+    }
+
+    /**
+     * Retrieve the scoresheet of a given player
+     * @param playerId
+     * @return scoresheet of a given player
+     */
+    @Override
+    public ScoresheetDto getScoresheet(Long playerId) {
+        Player player = playerRepository.findById(playerId).orElseThrow(() -> new ResourceNotFoundException(Player.class,"id",playerId));
+        Scoresheet scoresheet = Optional.ofNullable(player.getScoreSheet()).orElseThrow(() -> new MissingScoresheetException(player));
+        return new ScoresheetDto(scoresheet.toString());
+    }
+
+    /**
+     * Generate a new scoresheet to give to the player with 10 new frames
+     * @return {@link Scoresheet}
+     */
+    @Override
+    public Scoresheet generateNewScoresheet() {
+        Scoresheet newScoreSheet = new Scoresheet();
+        List<Frame> newFrames = new ArrayList<>();
+        for(int i=0; i<10; i++){
+            newFrames.add(Frame.builder().scoresheet(newScoreSheet).frameIndex(i).build());
+        }
+        newScoreSheet.setFrames(newFrames);
+        return newScoreSheet;
     }
 
     /**
@@ -107,37 +146,6 @@ public class GameServiceImpl implements GameService {
     }
 
     /**
-     * Calculate a given player's current score
-     * @param playerId
-     * @return player's current score
-     */
-    @Override
-    public ScoreDto getCurrentScore(Long playerId) {
-        int currentScore = 0;
-        Player player = playerRepository.findById(playerId).orElseThrow(() -> new ResourceNotFoundException(Player.class,"id",playerId));
-        Scoresheet scoresheet = Optional.ofNullable(player.getScoreSheet()).orElseThrow(() -> new MissingScoresheetException(player));
-        int currentFrameIndex = scoresheet.getCurrentFrameIndex();
-
-        if(!CollectionUtils.isEmpty(scoresheet.getFrames())){
-            currentScore = scoresheet.getFrames().get(currentFrameIndex).getScore();
-        }
-
-        return new ScoreDto(currentScore);
-    }
-
-    /**
-     * Retrieve the scoresheet of a given player
-     * @param playerId
-     * @return scoresheet of a given player
-     */
-    @Override
-    public ScoresheetDto getScoresheet(Long playerId) {
-        Player player = playerRepository.findById(playerId).orElseThrow(() -> new ResourceNotFoundException(Player.class,"id",playerId));
-        Scoresheet scoresheet = Optional.ofNullable(player.getScoreSheet()).orElseThrow(() -> new MissingScoresheetException(player));
-        return null;
-    }
-
-    /**
      * Total score
      * @return total score of all played frames
      */
@@ -146,7 +154,15 @@ public class GameServiceImpl implements GameService {
         int totalScore = 0;
         Collections.sort(scoresheet.getFrames());
         for(Frame frame: scoresheet.getFrames()){
-            frameScore = getFrameScore(scoresheet.getFrames(),frame.getFrameIndex());
+            Frame nextFrame = null;
+            Frame nextNextFrame = null;
+            if (frame.getFrameIndex()+1 < scoresheet.getFrames().size()){
+                nextFrame = scoresheet.getFrames().get(frame.getFrameIndex()+1);
+            }
+            if (frame.getFrameIndex()+2 < scoresheet.getFrames().size()){
+                nextNextFrame = scoresheet.getFrames().get(frame.getFrameIndex()+2);
+            }
+            frameScore = getFrameScore(frame,nextFrame,nextNextFrame);
             frame.setScore(frameScore);
             totalScore += frameScore;
         }
@@ -155,20 +171,20 @@ public class GameServiceImpl implements GameService {
 
     /**
      * Calculate the score for a given frame index
-     * @param frames
-     * @param frameIndex
+     * @param frame - current frame
+     * @param nextFrame - next frame is needed to calculate bonus points
+     * @param nextNextFrame - next frame is needed to calculate bonus points
      * @return frame score
      */
-    private int getFrameScore(List<Frame> frames, int frameIndex) {
-        Frame frame = frames.get(frameIndex);
+    private int getFrameScore(Frame frame, Frame nextFrame, Frame nextNextFrame) {
         if (frame == null) {
             return 0;
         }
         if (frame.isStrike()) {
-            return 10 + strikeBonus(frames,frameIndex);
+            return 10 + strikeBonus(frame,nextFrame,nextNextFrame);
         }
         if (frame.isSpare()) {
-            return 10 + spareBonus(frames,frameIndex);
+            return 10 + spareBonus(frame,nextFrame);
         }
         return rollValue(frame.getFirstRoll()) + rollValue(frame.getSecondRoll());
     }
@@ -176,40 +192,36 @@ public class GameServiceImpl implements GameService {
     /**
      * Calculate the Spare Bonus for a frame
      * Bonus is based on next frame
-     * @param frames
-     * @param frameIndex
+     * @param frame - current frame
+     * @param nextFrame - next frame is needed to calculate bonus points
      * @return frame score with spare bonus calculated
      */
-    private int spareBonus(List<Frame> frames, int frameIndex) {
-        if (frameIndex == 9) {
-            Frame lastFrame = frames.get(frameIndex);
-            return rollValue(lastFrame.getThirdRoll());
+    private int spareBonus(Frame frame, Frame nextFrame) {
+        if (frame.getFrameIndex() == 9) {
+            return rollValue(frame.getThirdRoll());
         }
-        Frame nextFrame = frames.get(frameIndex + 1);
         return nextFrame == null ? 0 : rollValue(nextFrame.getFirstRoll());
     }
 
     /**
      * Calculate the Strike Bonus for a frame
      * Bonus is based on next frame
-     * @param frames
-     * @param frameIndex
+     * @param frame - current frame
+     * @param nextFrame - next frame is needed to calculate bonus points
+     * @param nextNextFrame - next frame is needed to calculate bonus points
      * @return frame score with strike bonus calculated
      */
-    private int strikeBonus(List<Frame> frames, int frameIndex) {
-        if (frameIndex == 9) {
-            Frame lastFrame = frames.get(frameIndex);
-            return rollValue(lastFrame.getSecondRoll()) + rollValue(lastFrame.getThirdRoll());
+    private int strikeBonus(Frame frame, Frame nextFrame, Frame nextNextFrame) {
+        if (frame.getFrameIndex() == 9) {
+            return rollValue(frame.getSecondRoll()) + rollValue(frame.getThirdRoll());
         }
-        Frame nextFrame = frames.get(frameIndex + 1);
         if (nextFrame == null) {
             return 0;
         }
         if (nextFrame.isStrike()) {
-            if (frameIndex == 8) {
+            if (frame.getFrameIndex() == 8) {
                 return 10 + rollValue(nextFrame.getSecondRoll());
             }
-            Frame nextNextFrame = frames.get(frameIndex + 2);
             return nextNextFrame == null ? 0 : 10 + rollValue(nextNextFrame.getFirstRoll());
         }
         return rollValue(nextFrame.getFirstRoll()) + rollValue(nextFrame.getSecondRoll());
