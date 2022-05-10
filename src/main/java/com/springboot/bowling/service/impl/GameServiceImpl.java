@@ -76,7 +76,7 @@ public class GameServiceImpl implements GameService {
      * @return player's current score
      */
     @Override
-    public ScoreDto getCurrentScore(Long playerId) {
+    public ScoreDto getPlayersCurrentScore(Long playerId) {
         int currentScore = 0;
         Player player = playerRepository.findById(playerId).orElseThrow(() -> new ResourceNotFoundException(Player.class,"id",playerId));
         Scoresheet scoresheet = Optional.ofNullable(player.getScoreSheet()).orElseThrow(() -> new MissingScoresheetException(player));
@@ -90,7 +90,7 @@ public class GameServiceImpl implements GameService {
      * @return scoresheet of a given player
      */
     @Override
-    public ScoresheetDto getScoresheet(Long playerId) {
+    public ScoresheetDto getPlayersScoresheet(Long playerId) {
         Player player = playerRepository.findById(playerId).orElseThrow(() -> new ResourceNotFoundException(Player.class,"id",playerId));
         Scoresheet scoresheet = Optional.ofNullable(player.getScoreSheet()).orElseThrow(() -> new MissingScoresheetException(player));
         return new ScoresheetDto(scoresheet.toString());

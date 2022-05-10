@@ -57,7 +57,7 @@ public class BowlingAlleyController {
     @ApiOperation(value = "Get a player's current score")
     @GetMapping("/score/{playerId}")
     public ResponseEntity<ScoreDto> getPlayerScore(@PathVariable(name = "playerId") Long playerId){
-        return new ResponseEntity<>(gameService.getCurrentScore(playerId), HttpStatus.OK);
+        return new ResponseEntity<>(gameService.getPlayersCurrentScore(playerId), HttpStatus.OK);
     }
 
     /**
@@ -68,7 +68,7 @@ public class BowlingAlleyController {
     @ApiOperation(value = "Get a player's current scoresheet")
     @GetMapping("/scoresheet/{playerId}")
     public ResponseEntity<ScoresheetDto> getPlayerScoresheet(@PathVariable(name = "playerId") Long playerId){
-        return new ResponseEntity<>(gameService.getScoresheet(playerId), HttpStatus.OK);
+        return new ResponseEntity<>(gameService.getPlayersScoresheet(playerId), HttpStatus.OK);
     }
 
 }

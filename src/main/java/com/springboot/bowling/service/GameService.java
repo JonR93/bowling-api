@@ -15,6 +15,6 @@ public interface GameService {
     Scoresheet generateNewScoresheet();
     void startGame(Long playerId);
     void throwBall(Long playerId, int frameIndex, int ballIndex, int score);
-    ScoreDto getCurrentScore(Long playerId);
-    ScoresheetDto getScoresheet(Long playerId);
+    ScoreDto getPlayersCurrentScore(Long playerId);
+    ScoresheetDto getPlayersScoresheet(Long playerId);
 }
