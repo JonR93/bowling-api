@@ -11,7 +11,7 @@ import java.util.Date;
  * Error DTO object for sending errors/exceptions to the client
  */
 
-@ApiModel(description = "Error Model Info")
+@ApiModel(description = "Generic error response Dto")
 @Getter
 @SuperBuilder
 public class ErrorDto extends ResponseDto{

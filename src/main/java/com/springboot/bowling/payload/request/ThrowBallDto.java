@@ -8,9 +8,12 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
+
+/**
+ * Request DTO representing a ball thrown by a player
+ */
 
 @ApiModel(description = "Request DTO representing a ball thrown by a player")
 @Data

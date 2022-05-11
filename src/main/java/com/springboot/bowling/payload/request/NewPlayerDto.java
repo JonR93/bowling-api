@@ -13,7 +13,7 @@ import javax.validation.constraints.NotEmpty;
  * Request DTO for adding a new player to the system
  */
 
-@ApiModel(description = "Player Model Info")
+@ApiModel(description = "Request DTO for adding a new player to the system")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
