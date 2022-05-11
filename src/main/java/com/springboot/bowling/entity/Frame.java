@@ -199,34 +199,52 @@ public class Frame implements Comparable<Frame> {
         StringBuilder sb = new StringBuilder();
         if(isStrike()){
             sb.append("X");
-            if(frameIndex==9){
-                // Check if we need to include bonus rolls on last frame
-                if(Integer.valueOf(10).equals(secondRoll)){
-                    sb.append("X"); // bonus strike
-                    if(Integer.valueOf(10).equals(thirdRoll)){
-                        sb.append("X"); // second bonus strike
-                    }
-                } else if(secondRoll!=null && thirdRoll != null && Integer.sum(secondRoll, thirdRoll) == 10){
-                    sb.append(secondRoll.equals(0)?"-":secondRoll).append("/"); // bonus spare
-                } else {
-                    sb.append(Optional.ofNullable(secondRoll).orElse(0).equals(0)?"-":secondRoll);
-                    sb.append(Optional.ofNullable(thirdRoll).orElse(0).equals(0)?"-":thirdRoll);
-                }
-            }
+            appendLastFrameStrikeBonus(sb);
         } else if(isSpare()){
             sb.append(firstRoll.equals(0)?"-":firstRoll).append("/");
-            if(frameIndex==9){
-                // Check if we need to include bonus rolls on last frame
-                if(Integer.valueOf(10).equals(thirdRoll)){
-                    sb.append("X"); // bonus strike
-                } else{
-                    sb.append(Optional.ofNullable(thirdRoll).orElse(0).equals(0)?"-":thirdRoll); // bonus roll
-                }
-            }
+            appendLastFrameSpareBonus(sb);
         } else{
             sb.append(Optional.ofNullable(firstRoll).orElse(0).equals(0)?"-":firstRoll);
             sb.append(Optional.ofNullable(secondRoll).orElse(0).equals(0)?"-":secondRoll);
         }
         return sb.toString();
+    }
+
+    /**
+     * Helper method to generate the scoresheet for the last frame
+     * Strike Bonus
+     * @param sb
+     */
+    private void appendLastFrameStrikeBonus(StringBuilder sb){
+        if(sb!=null && frameIndex==9){
+            // Check if we need to include bonus rolls on last frame
+            if(Integer.valueOf(10).equals(secondRoll)){
+                sb.append("X"); // bonus strike
+                if(Integer.valueOf(10).equals(thirdRoll)){
+                    sb.append("X"); // second bonus strike
+                }
+            } else if(secondRoll!=null && thirdRoll != null && Integer.sum(secondRoll, thirdRoll) == 10){
+                sb.append(secondRoll.equals(0)?"-":secondRoll).append("/"); // bonus spare
+            } else {
+                sb.append(Optional.ofNullable(secondRoll).orElse(0).equals(0)?"-":secondRoll);
+                sb.append(Optional.ofNullable(thirdRoll).orElse(0).equals(0)?"-":thirdRoll);
+            }
+        }
+    }
+
+    /**
+     * Helper method to generate the scoresheet for the last frame
+     * Spare Bonus
+     * @param sb
+     */
+    private void appendLastFrameSpareBonus(StringBuilder sb){
+        if(sb!=null && frameIndex==9){
+            // Check if we need to include bonus rolls on last frame
+            if(Integer.valueOf(10).equals(thirdRoll)){
+                sb.append("X"); // bonus strike
+            } else{
+                sb.append(Optional.ofNullable(thirdRoll).orElse(0).equals(0)?"-":thirdRoll); // bonus roll
+            }
+        }
     }
 }
