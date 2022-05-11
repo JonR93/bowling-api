@@ -1,0 +1,168 @@
+{
+	"info": {
+		"_postman_id": "d038389e-83f2-4121-85e8-9c81efaea94b",
+		"name": "bowling-api",
+		"description": "In this exercise, we want you to create a web service server that responds to specific API calls that  \nwill simulate a bowling game server",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add Player",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Jon\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/player",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"player"
+					]
+				},
+				"description": "**Add a player to the system**  \n• request: path: /player, body: {\"name\":\"\"}  \n• output: {\"status\":\"ok\", \"id\":\"\"}  \nWhere is a unique string identifying the player."
+			},
+			"response": []
+		},
+		{
+			"name": "Start Game",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"d9d6ab03-fc4a-4c3b-b3b3-4ac1912cfeda\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/startGame",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"startGame"
+					]
+				},
+				"description": "**Start a game for a player**  \n• request: path: /startGame, body: {\"id\":\"\"}  \n• output: {\"status\":\"ok\"}"
+			},
+			"response": []
+		},
+		{
+			"name": "Throw Ball",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\":\"d9d6ab03-fc4a-4c3b-b3b3-4ac1912cfeda\",\r\n    \"frameIndex\":0,\r\n    \"ballIndex\":0,\r\n    \"score\": 10\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/throwBall",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"throwBall"
+					]
+				},
+				"description": "**Throw a ball for a player**  \n• request: path: /throwBall, body: {\"id\":\"\", \"frameIndex\":,  \n\"ballIndex\":, \"score\":}  \n• output: {\"status\":\"ok\"}  \nWhere is a 0 based integer representing the relevant frame, is a 0 based  \ninteger representing the relevant ball, and is an integer score for the number of pins  \nknocked down by this throw."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Player's Score By Player Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/score/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"score",
+						"1"
+					]
+				},
+				"description": "**Get a player's current score**  \n• request: path: /score, query params: id:  \n• output: {\"status\":\"ok\", \"score\":}  \nWhere is the integer score for the specified user at the requested frame, not  \ncounting any future score calculations. (ie this would be their score if no more balls were thrown)"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Player's Scoresheet By Player Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/scoresheet/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"scoresheet",
+						"1"
+					]
+				},
+				"description": "StartFragment\n\n**Get a player's current scoresheet**  \n• request: path: /scoresheet, query params: id:  \n• output: {\"status\":\"ok\", \"sheet\":}  \nWhere String containing space separated frames, each frame  \nrepresented as 1 or 2 characters, like so:  \n'-' 0 pins knocked down  \n'1' to '9' Number of pins knocked down  \n'/' Spare  \n'X' Strike  \n**Example: 8- 7- 53 9/ 9/ X 8- 51 3/ 9-**\n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Player",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"21974966-4e2f-4b72-a92c-e214c4640bec\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/player",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"player"
+					]
+				},
+				"description": "**Delete a player from the system**  \n• request: path: /player, body: {\"id\":\"\"}  \n• output: {\"status\":\"ok\"}"
+			},
+			"response": []
+		}
+	]
+}
