@@ -30,10 +30,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorDto> handleResourceNotFoundException(ResourceNotFoundException exception, WebRequest request) {
-        ErrorDto error = new ErrorDto(HttpStatus.NOT_FOUND.getReasonPhrase(),
-                                        new Date(),
-                                        exception.getMessage(),
-                                        request.getDescription(false));
+
+        ErrorDto error = ErrorDto.builder()
+                .status(HttpStatus.NOT_FOUND.getReasonPhrase())
+                .message(exception.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(new Date())
+                .build();
 
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
@@ -46,10 +49,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorDto> handleBlogApiException(BadRequestException exception, WebRequest request) {
-        ErrorDto error = new ErrorDto(HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                                        new Date(),
-                                        exception.getMessage(),
-                                        request.getDescription(false));
+
+        ErrorDto error = ErrorDto.builder()
+                .status(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(exception.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(new Date())
+                .build();
+
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
@@ -85,10 +92,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDto> handleGlobalException(Exception exception, WebRequest request) {
-        ErrorDto error = new ErrorDto(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                                        new Date(),
-                                        exception.getMessage(),
-                                        request.getDescription(false));
+
+        ErrorDto error = ErrorDto.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                .message(exception.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(new Date())
+                .build();
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }

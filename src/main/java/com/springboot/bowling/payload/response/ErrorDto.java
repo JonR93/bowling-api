@@ -2,8 +2,8 @@ package com.springboot.bowling.payload.response;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Date;
 
@@ -12,11 +12,9 @@ import java.util.Date;
  */
 
 @ApiModel(description = "Error Model Info")
-@Data
-@AllArgsConstructor
-public class ErrorDto {
-    @ApiModelProperty(value = "HTTP status")
-    private String status;
+@Getter
+@SuperBuilder
+public class ErrorDto extends ResponseDto{
     @ApiModelProperty(value = "Error timestamp")
     private Date timestamp;
     @ApiModelProperty(value = "Error message")

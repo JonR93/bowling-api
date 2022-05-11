@@ -1,12 +1,10 @@
 package com.springboot.bowling.controller;
 
+import com.springboot.bowling.entity.Scoresheet;
 import com.springboot.bowling.payload.request.StartGameDto;
 import com.springboot.bowling.payload.request.ThrowBallDto;
-import com.springboot.bowling.payload.response.BallThrownDto;
-import com.springboot.bowling.payload.response.GameStatedDto;
-import com.springboot.bowling.payload.response.ScoreDto;
-import com.springboot.bowling.payload.response.ScoresheetDto;
-import com.springboot.bowling.service.GameService;
+import com.springboot.bowling.payload.response.*;
+import com.springboot.bowling.service.BowlingAlleyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -23,7 +21,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class BowlingAlleyController {
 
-    private GameService gameService;
+    private BowlingAlleyService bowlingAlleyService;
 
     /**
      * Start a new game for a given player id
@@ -32,8 +30,14 @@ public class BowlingAlleyController {
      */
     @ApiOperation(value = "Start a new game for a given player")
     @PostMapping("/startGame")
-    public ResponseEntity<GameStatedDto> startGame(@Valid @RequestBody StartGameDto startGameDto) {
-        return new ResponseEntity<>(gameService.startGame(startGameDto.getId()), HttpStatus.OK);
+    public ResponseEntity<ResponseDto> startGame(@Valid @RequestBody StartGameDto startGameDto) {
+        bowlingAlleyService.startGame(startGameDto.getId());
+
+        GameStatedDto gameStatedDto = GameStatedDto.builder()
+                                        .status(HttpStatus.OK.getReasonPhrase())
+                                        .build();
+
+        return new ResponseEntity<>(gameStatedDto, HttpStatus.OK);
     }
 
     /**
@@ -43,12 +47,17 @@ public class BowlingAlleyController {
      */
     @ApiOperation(value = "Throw a ball for a player")
     @PostMapping("/throwBall")
-    public ResponseEntity<BallThrownDto> throwBall(@Valid @RequestBody ThrowBallDto throwBallDto){
-        gameService.throwBall(throwBallDto.getId(),
+    public ResponseEntity<ResponseDto> throwBall(@Valid @RequestBody ThrowBallDto throwBallDto){
+        bowlingAlleyService.throwBall(throwBallDto.getId(),
                 throwBallDto.getFrameIndex(),
                 throwBallDto.getBallIndex(),
                 throwBallDto.getScore());
-        return new ResponseEntity<>(new BallThrownDto(HttpStatus.OK.getReasonPhrase()), HttpStatus.OK);
+
+        BallThrownDto ballThrownDto = BallThrownDto.builder()
+                .status(HttpStatus.OK.getReasonPhrase())
+                .build();
+
+        return new ResponseEntity<>(ballThrownDto, HttpStatus.OK);
     }
 
     /**
@@ -58,8 +67,15 @@ public class BowlingAlleyController {
      */
     @ApiOperation(value = "Get a player's current score")
     @GetMapping("/score/{playerId}")
-    public ResponseEntity<ScoreDto> getPlayerScore(@PathVariable(name = "playerId") UUID playerId){
-        return new ResponseEntity<>(gameService.getPlayersCurrentScore(playerId), HttpStatus.OK);
+    public ResponseEntity<ResponseDto> getPlayerScore(@PathVariable(name = "playerId") UUID playerId){
+        int currentPlayerScore = bowlingAlleyService.getPlayersCurrentScore(playerId);
+
+        ScoreDto scoreDto = ScoreDto.builder()
+                .score(currentPlayerScore)
+                .status(HttpStatus.OK.getReasonPhrase())
+                .build();
+
+        return new ResponseEntity<>(scoreDto, HttpStatus.OK);
     }
 
     /**
@@ -69,8 +85,15 @@ public class BowlingAlleyController {
      */
     @ApiOperation(value = "Get a player's current scoresheet")
     @GetMapping("/scoresheet/{playerId}")
-    public ResponseEntity<ScoresheetDto> getPlayerScoresheet(@PathVariable(name = "playerId") UUID playerId){
-        return new ResponseEntity<>(gameService.getPlayersScoresheet(playerId), HttpStatus.OK);
+    public ResponseEntity<ResponseDto> getPlayerScoresheet(@PathVariable(name = "playerId") UUID playerId){
+        Scoresheet playersScoresheet = bowlingAlleyService.getPlayersScoresheet(playerId);
+
+        ScoresheetDto scoresheetDto = ScoresheetDto.builder()
+                .sheet(playersScoresheet.toString())
+                .status(HttpStatus.OK.getReasonPhrase())
+                .build();
+
+        return new ResponseEntity<>(scoresheetDto, HttpStatus.OK);
     }
 
 }

@@ -2,10 +2,8 @@ package com.springboot.bowling.payload.response;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Scoresheet DTO
@@ -13,15 +11,9 @@ import lombok.NoArgsConstructor;
  */
 
 @ApiModel(description = "Response DTO representing the player's scoresheet")
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class ScoresheetDto {
-
-    @ApiModelProperty(value = "HTTP status")
-    private String status;
-
+@Getter
+@SuperBuilder
+public class ScoresheetDto extends ResponseDto{
     @ApiModelProperty(value = "Player's scoresheet")
     private String sheet;
 }
