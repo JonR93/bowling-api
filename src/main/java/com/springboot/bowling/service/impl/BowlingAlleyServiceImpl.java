@@ -87,8 +87,7 @@ public class BowlingAlleyServiceImpl implements BowlingAlleyService {
     @Override
     public Scoresheet getPlayersScoresheet(UUID playerId) {
         Player player = playerRepository.findById(playerId).orElseThrow(() -> new ResourceNotFoundException(Player.class,"id",playerId));
-        Scoresheet scoresheet = Optional.ofNullable(player.getScoreSheet()).orElseThrow(() -> new MissingScoresheetException(player));
-        return scoresheet;
+        return Optional.ofNullable(player.getScoreSheet()).orElseThrow(() -> new MissingScoresheetException(player));
     }
 
     /**
