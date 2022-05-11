@@ -7,14 +7,18 @@ From IDE: simply run or debug ~bowling-api\src\main\java\com\springboot\bowling\
 
 *Add a player to the system:*
 
-• request: path: http://localhost:8080/player, body: {"name":"<player name>"}
+• request: 
+type: POST, 
+path: http://localhost:8080/player, 
+body: {"name":"<player name>"}
 
 • output: {"status":"ok", "id":"<player id>"}
 Where <player id> is a unique string identifying the player.
 
 *Delete a player from the system:*
 
-• request: 
+• request:
+type: DELETE,
 path: http://localhost:8080/player, 
 body:{"id":"<player id>"}
 
@@ -22,13 +26,18 @@ body:{"id":"<player id>"}
 
 *Start a game for a player:*
 
-• request: path: http://localhost:8080/startGame, body: {"id":"<player id>"}
+• request: 
+type: POST,
+path: http://localhost:8080/startGame, 
+body: {"id":"<player id>"}
 
 • output: {"status":"ok"}
 
 *Throw a ball for a player:*
 
-• request: path: http://localhost:8080/throwBall, body: {"id":"<player id>", "frameIndex":<frame index>,
+• request: type: POST,
+path: http://localhost:8080/throwBall, 
+body: {"id":"<player id>", "frameIndex":<frame index>,
 "ballIndex":<ball index>, "score":<score>}
 
 • output: {"status":"ok"}
@@ -38,7 +47,9 @@ knocked down by this throw.
 
 *Get a player's current score:*
 
-• request: path: http://localhost:8080/score, query params: id: <player id>
+• request: type: GET,
+path: http://localhost:8080/score, 
+query params: id: <player id>
 
 • output: {"status":"ok", "score":<player score>}
 Where <player score> is the integer score for the specified user at the requested frame, not
@@ -46,7 +57,10 @@ counting any future score calculations. (ie this would be their score if no more
 
 *Get a player's current scoresheet:*
 
-• request: path: http://localhost:8080/scoresheet, query params: id: <player id>
+• request:
+type: GET,
+path: http://localhost:8080/scoresheet, 
+query params: id: <player id>
 
 • output: {"status":"ok", "sheet":<text representation of game scores>}
 Where <text representation of game scores> String containing space separated frames, each frame
